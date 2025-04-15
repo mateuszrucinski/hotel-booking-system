@@ -25,10 +25,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                //to enable frames in order to see them in web
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
 //                        .requestMatchers("/room/hello", "/room/rooms", "/room/rooms/available").hasAnyRole( UserRole.GUEST.name())
-//                        .requestMatchers("/room/**").hasRole(UserRole.ADMIN.name())
+                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

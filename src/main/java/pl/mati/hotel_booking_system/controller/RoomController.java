@@ -4,6 +4,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.mati.hotel_booking_system.entity.Room;
 import pl.mati.hotel_booking_system.repository.RoomRepository;
+import pl.mati.hotel_booking_system.service.RoomService;
 import pl.mati.hotel_booking_system.util.RoomState;
 
 import java.util.List;
@@ -12,10 +13,10 @@ import java.util.List;
 @RequestMapping("/room")
 public class RoomController {
 
-    private final RoomRepository roomRepository;
+    private final RoomService roomService;
 
-    public RoomController(RoomRepository roomRepository) {
-        this.roomRepository = roomRepository;
+    public RoomController(RoomService roomService) {
+        this.roomService = roomService;
     }
 
     @GetMapping("/hello")
@@ -27,20 +28,18 @@ public class RoomController {
     @GetMapping("/rooms")
     @PreAuthorize("hasAnyRole('GUEST', 'ADMIN')")
     public List<Room> getAllRooms() {
-        List<Room> allRooms = roomRepository.findAll();
-        return allRooms;
+        return roomService.getAllRooms();
     }
 
     @GetMapping("/rooms/available")
     @PreAuthorize("hasAnyRole('GUEST', 'ADMIN')")
     public List<Room> getAllAvailableRooms() {
-        List<Room> allAvailableRooms = roomRepository.findAllByState(RoomState.AVAILABLE);
-        return allAvailableRooms;
+        return roomService.getAllAvailableRooms();
     }
 
     @PostMapping()
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void addRoom(@RequestBody Room newRoom) {
-        roomRepository.save(newRoom);
+        roomService.addRoom(newRoom);
     }
 }
