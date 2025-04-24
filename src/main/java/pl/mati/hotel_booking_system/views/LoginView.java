@@ -1,5 +1,7 @@
 package pl.mati.hotel_booking_system.views;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -20,6 +22,7 @@ public class LoginView extends VerticalLayout {
         LoginForm loginForm = new LoginForm();
         loginForm.setAction("login");
 
-        add(header, loginForm);
+        Button goToRegister = new Button("Register", e -> UI.getCurrent().navigate("register"));
+        add(header, loginForm, goToRegister);
     }
 }
