@@ -3,14 +3,12 @@ package pl.mati.hotel_booking_system.controller;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.mati.hotel_booking_system.entity.Room;
-import pl.mati.hotel_booking_system.repository.RoomRepository;
 import pl.mati.hotel_booking_system.service.RoomService;
-import pl.mati.hotel_booking_system.util.RoomState;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/room")
+@RequestMapping("/api/room")
 public class RoomController {
 
     private final RoomService roomService;

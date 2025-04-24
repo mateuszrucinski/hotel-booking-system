@@ -1,38 +1,54 @@
 package pl.mati.hotel_booking_system.configuration;
 
+import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import pl.mati.hotel_booking_system.entity.HotelUser;
 import pl.mati.hotel_booking_system.repository.UserRepository;
 import pl.mati.hotel_booking_system.util.UserRole;
+import pl.mati.hotel_booking_system.views.LoginView;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig {
+public class SecurityConfig extends VaadinWebSecurity {
 
+    private final UserDetailsService userDetailsService;
+
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
+    //security configuration for vaadin views - login form
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        setLoginView(http, LoginView.class);
+    }
+
+    //http basic configuration for api endpoints
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                //to enable frames in order to see them in web
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-                .httpBasic(Customizer.withDefaults())
+                .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/room/hello", "/room/rooms", "/room/rooms/available").hasAnyRole( UserRole.GUEST.name())
-                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
@@ -42,7 +58,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    //for testing to handle auth manager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
