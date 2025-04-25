@@ -29,47 +29,12 @@ public class RoomService {
     }
 
     public List<Room> getFilteredRooms(RoomType inputRoomType, int minimumPrice, int maximumPrice) {
-        //example of polymorphism
-        Set<Room> filteredRoomsSet = new HashSet<>();
-
-        if (inputRoomType != null) {
-            filteredRoomsSet.addAll(getAvailableRoomsByRoomType(inputRoomType));
-        }
-
-        if (minimumPrice != 0 || maximumPrice != 0) {
-            filteredRoomsSet.addAll(getAvailableRoomsByPriceRange(minimumPrice, maximumPrice));
-        }
-
-        return filteredRoomsSet.stream().toList();
-    }
-
-
-    private List<Room> getAvailableRoomsByRoomType(RoomType inputRoomType) {
-        List<Room> allAvailableRooms = getAllAvailableRooms();
-
-        List<Room> inputRoomTypeAvailableRooms = allAvailableRooms.stream()
-                .filter(room -> room.getRoomType() == inputRoomType)
+        return getAllAvailableRooms().stream()
+                .filter(room -> inputRoomType == null || room.getRoomType() == inputRoomType)
+                .filter(room -> room.getPrice() >= minimumPrice)
+                .filter(room -> maximumPrice == 0 || room.getPrice() <= maximumPrice)
                 .toList();
-        return inputRoomTypeAvailableRooms;
     }
-
-    private List<Room> getAvailableRoomsByPriceRange(int minimumPrice, int maximumPrice) {
-        List<Room> allAvailableRooms = getAllAvailableRooms();
-
-        List<Room> priceRageAvailableRooms;
-        if (maximumPrice != 0) {
-            priceRageAvailableRooms = allAvailableRooms.stream()
-                    .filter(room -> room.getPrice() >= minimumPrice &&
-                            room.getPrice() <= maximumPrice
-                    ).toList();
-        } else {
-            priceRageAvailableRooms = allAvailableRooms.stream()
-                    .filter(room -> room.getPrice() >= minimumPrice
-                    ).toList();
-        }
-        return priceRageAvailableRooms;
-    }
-
 
     public void addRoom(Room newRoom) {
         roomRepository.save(newRoom);
