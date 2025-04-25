@@ -24,7 +24,7 @@ public class Room {
     @NonNull
     private RoomType roomType;
     @NonNull
-    private Float priceRange;
+    private Float price;
     @NonNull
     private RoomState state;
 

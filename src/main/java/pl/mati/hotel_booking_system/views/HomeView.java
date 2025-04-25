@@ -16,9 +16,13 @@ import pl.mati.hotel_booking_system.service.RoomService;
 import pl.mati.hotel_booking_system.util.RoomState;
 import pl.mati.hotel_booking_system.util.RoomType;
 
+import java.util.List;
+
 @Route("home")
 @RolesAllowed("GUEST")
 public class HomeView extends VerticalLayout {
+
+    private final Grid<Room> grid = new Grid<>(Room.class);
 
     public HomeView(RoomService roomService) {
         setSizeFull();
@@ -37,31 +41,40 @@ public class HomeView extends VerticalLayout {
 
         topBar.add(title, avatar);
 
-        // filter bar
+        // Filter bar
         ComboBox<RoomType> typeFilter = new ComboBox<>("Room type");
         typeFilter.setItems(RoomType.values());
 
         NumberField minPrice = new NumberField("Price from");
-        NumberField maxPrice = new NumberField("Price to");
+        minPrice.setStep(1);
+        minPrice.setMin(0);
 
-        ComboBox<RoomState> stateFilter = new ComboBox<>("State");
-        stateFilter.setItems(RoomState.values());
+        NumberField maxPrice = new NumberField("Price to");
+        maxPrice.setStep(1);
+        maxPrice.setMin(0);
 
         Button filterButton = new Button("Filter");
+        filterButton.addClickListener(e -> {
+            RoomType selectedType = typeFilter.getValue();
+            int min = minPrice.getValue() != null ? minPrice.getValue().intValue() : 0;
+            int max = maxPrice.getValue() != null ? maxPrice.getValue().intValue() : 0;
 
-        HorizontalLayout filterBar = new HorizontalLayout(typeFilter, minPrice, maxPrice, stateFilter, filterButton);
+            List<Room> filteredRooms = roomService.getFilteredRooms(selectedType, min, max);
+            grid.setItems(filteredRooms);
+        });
+
+        HorizontalLayout filterBar = new HorizontalLayout(typeFilter, minPrice, maxPrice, filterButton);
         filterBar.setPadding(true);
         filterBar.setAlignItems(Alignment.END);
 
         // room grid
-        Grid<Room> grid = new Grid<>(Room.class);
         grid.setItems(roomService.getAllAvailableRooms());
         grid.removeAllColumns();
         grid.addColumn(Room::getRoomId).setHeader("ID");
         grid.addColumn(Room::getRoomType).setHeader("Room type");
-        grid.addColumn(Room::getPriceRange).setHeader("Price");
+        grid.addColumn(Room::getPrice).setHeader("Price");
         grid.addColumn(Room::getState).setHeader("State");
 
-        add(topBar, grid);
+        add(topBar, filterBar, grid);
     }
 }
