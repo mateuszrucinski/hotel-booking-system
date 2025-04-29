@@ -6,13 +6,19 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.security.core.context.SecurityContextHolder;
+import pl.mati.hotel_booking_system.entity.GuestRoom;
+import pl.mati.hotel_booking_system.entity.HotelUser;
 import pl.mati.hotel_booking_system.entity.Room;
+import pl.mati.hotel_booking_system.security.UserDetailsImpl;
+import pl.mati.hotel_booking_system.service.GuestRoomService;
 import pl.mati.hotel_booking_system.service.RoomService;
 import pl.mati.hotel_booking_system.util.RoomType;
 
@@ -24,7 +30,7 @@ public class HomeView extends VerticalLayout {
 
     private final Grid<Room> grid = new Grid<>(Room.class);
 
-    public HomeView(RoomService roomService) {
+    public HomeView(RoomService roomService, GuestRoomService guestRoomService) {
         setSizeFull();
         setPadding(false);
         setSpacing(false);
@@ -40,6 +46,29 @@ public class HomeView extends VerticalLayout {
         Avatar avatar = new Avatar();
 
         topBar.add(title, avatar);
+        add(topBar);
+
+        //reserved rooms list from user
+        HotelUser currentUser = ((UserDetailsImpl) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal()).getHotelUser();
+
+        List<GuestRoom> userReservations = guestRoomService.getReservationsByUser(currentUser);
+        if(!userReservations.isEmpty()) {
+            H2 reservationTitle = new H2("My reservation:");
+            Grid<GuestRoom> reservationGrid = new Grid<>(GuestRoom.class);
+            reservationGrid.setItems(userReservations);
+            reservationGrid.removeAllColumns();
+            reservationGrid.addColumn(gr -> gr.getRoom().getRoomId()).setHeader("Room ID");
+            reservationGrid.addColumn(gr -> gr.getRoom().getRoomType()).setHeader("Type");
+            reservationGrid.addColumn(gr -> gr.getRoom().getState()).setHeader("State");
+            reservationGrid.addColumn(GuestRoom::getReservationCodeId).setHeader("Reservation Code");
+
+            reservationGrid.addItemClickListener(event -> {
+                Room reservedRoom = event.getItem().getRoom();
+                UI.getCurrent().navigate("home/reservation/room/" + reservedRoom.getRoomId());
+            });
+            add(reservationTitle, reservationGrid);
+        }
 
         // Filter bar
         ComboBox<RoomType> typeFilter = new ComboBox<>("Room type");
@@ -67,6 +96,7 @@ public class HomeView extends VerticalLayout {
         HorizontalLayout filterBar = new HorizontalLayout(typeFilter, minPrice, maxPrice, filterButton);
         filterBar.setPadding(true);
         filterBar.setAlignItems(Alignment.END);
+        add(filterBar);
 
         // room grid
         grid.setItems(roomService.getAllAvailableRooms());
@@ -82,8 +112,6 @@ public class HomeView extends VerticalLayout {
                 UI.getCurrent().navigate("home/room/" + clickedRoom.getRoomId());
             }
         });
-
-
-        add(topBar, filterBar, grid);
+        add(grid);
     }
 }

@@ -7,6 +7,7 @@ import pl.mati.hotel_booking_system.entity.Room;
 import pl.mati.hotel_booking_system.repository.GuestRoomRepository;
 import pl.mati.hotel_booking_system.util.RoomState;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,6 +36,10 @@ public class GuestRoomService {
         guestRoom.setReservationCodeId(generateReservationCode());
         guestRoom.setPaid(true);
         guestRoomRepository.save(guestRoom);
+    }
+
+    public List<GuestRoom> getReservationsByUser(HotelUser user) {
+        return guestRoomRepository.findAllByGuest(user);
     }
 
     private String generateReservationCode() {

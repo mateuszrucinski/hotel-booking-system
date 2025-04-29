@@ -43,4 +43,13 @@ public class RoomService {
     public void addRoom(Room newRoom) {
         roomRepository.save(newRoom);
     }
+
+    public void updateRoomState(Room room, RoomState newRoomState) {
+        if(roomRepository.findById(room.getRoomId()).isEmpty()) {
+            throw new RoomNotFoundException(room.getRoomId());
+        }
+
+        room.setState(newRoomState);
+        roomRepository.save(room);
+    }
 }
