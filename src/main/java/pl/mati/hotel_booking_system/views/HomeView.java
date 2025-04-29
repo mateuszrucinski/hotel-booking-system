@@ -1,19 +1,19 @@
 package pl.mati.hotel_booking_system.views;
 
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import pl.mati.hotel_booking_system.entity.Room;
 import pl.mati.hotel_booking_system.service.RoomService;
-import pl.mati.hotel_booking_system.util.RoomState;
 import pl.mati.hotel_booking_system.util.RoomType;
 
 import java.util.List;
@@ -44,6 +44,7 @@ public class HomeView extends VerticalLayout {
         // Filter bar
         ComboBox<RoomType> typeFilter = new ComboBox<>("Room type");
         typeFilter.setItems(RoomType.values());
+        typeFilter.setClearButtonVisible(true);
 
         NumberField minPrice = new NumberField("Price from");
         minPrice.setStep(1);
@@ -74,6 +75,14 @@ public class HomeView extends VerticalLayout {
         grid.addColumn(Room::getRoomType).setHeader("Room type");
         grid.addColumn(Room::getPrice).setHeader("Price");
         grid.addColumn(Room::getState).setHeader("State");
+
+        grid.addItemClickListener(event -> {
+            Room clickedRoom = event.getItem();
+            if (clickedRoom != null) {
+                UI.getCurrent().navigate("home/room/" + clickedRoom.getRoomId());
+            }
+        });
+
 
         add(topBar, filterBar, grid);
     }

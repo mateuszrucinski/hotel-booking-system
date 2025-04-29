@@ -2,13 +2,12 @@ package pl.mati.hotel_booking_system.service;
 
 import org.springframework.stereotype.Service;
 import pl.mati.hotel_booking_system.entity.Room;
+import pl.mati.hotel_booking_system.excpetion.RoomNotFoundException;
 import pl.mati.hotel_booking_system.repository.RoomRepository;
 import pl.mati.hotel_booking_system.util.RoomState;
 import pl.mati.hotel_booking_system.util.RoomType;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class RoomService {
@@ -16,6 +15,11 @@ public class RoomService {
 
     public RoomService(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
+    }
+
+    public Room getRoomById(Long roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException(roomId));
+        return room;
     }
 
     public List<Room> getAllRooms() {

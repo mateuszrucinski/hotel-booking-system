@@ -16,6 +16,10 @@ public class UserDetailsImpl implements UserDetails {
         this.hotelUser = hotelUser;
     }
 
+    public HotelUser getHotelUser() {
+        return hotelUser;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(
