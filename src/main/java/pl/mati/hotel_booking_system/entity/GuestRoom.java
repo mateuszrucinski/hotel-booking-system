@@ -26,6 +26,10 @@ public class GuestRoom {
 
     private LocalDate reservedDate = LocalDate.now();
 
+    private boolean isCheckIn = false;
+
+    private boolean isCheckOut = false;
+
     @ManyToOne
     @JoinColumn(name = "guest_id")
     private HotelUser guest;

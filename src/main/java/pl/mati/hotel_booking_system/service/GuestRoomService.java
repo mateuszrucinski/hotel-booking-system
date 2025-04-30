@@ -38,8 +38,22 @@ public class GuestRoomService {
         guestRoomRepository.save(guestRoom);
     }
 
-    public List<GuestRoom> getReservationsByUser(HotelUser user) {
-        return guestRoomRepository.findAllByGuest(user);
+    public List<GuestRoom> getReservationsByUserWhereIsNotCheckOut(HotelUser user) {
+        return guestRoomRepository.findAllByGuestAndIsCheckOutFalse(user);
+    }
+
+    public void markReservationAsCheckedIn(HotelUser guest, Room room) {
+        guestRoomRepository.findByGuestAndRoomAndIsCheckInFalse(guest, room).ifPresent(reservation -> {
+            reservation.setCheckIn(true);
+            guestRoomRepository.save(reservation);
+        });
+    }
+
+    public void markReservationAsCheckedOut(HotelUser guest, Room room) {
+        guestRoomRepository.findByGuestAndRoomAndIsCheckOutFalse(guest, room).ifPresent(reservation -> {
+            reservation.setCheckOut(true);
+            guestRoomRepository.save(reservation);
+        });
     }
 
     private String generateReservationCode() {

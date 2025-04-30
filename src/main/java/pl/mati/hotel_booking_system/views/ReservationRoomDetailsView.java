@@ -14,7 +14,11 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.security.core.context.SecurityContextHolder;
+import pl.mati.hotel_booking_system.entity.HotelUser;
 import pl.mati.hotel_booking_system.entity.Room;
+import pl.mati.hotel_booking_system.security.UserDetailsImpl;
+import pl.mati.hotel_booking_system.service.GuestRoomService;
 import pl.mati.hotel_booking_system.service.RoomService;
 import pl.mati.hotel_booking_system.util.RoomState;
 
@@ -24,9 +28,11 @@ import pl.mati.hotel_booking_system.util.RoomState;
 public class ReservationRoomDetailsView extends VerticalLayout implements HasUrlParameter<Long> {
 
     private final RoomService roomService;
+    private final GuestRoomService guestRoomService;
 
-    public ReservationRoomDetailsView(RoomService roomService) {
+    public ReservationRoomDetailsView(RoomService roomService, GuestRoomService guestRoomService) {
         this.roomService = roomService;
+        this.guestRoomService = guestRoomService;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -44,6 +50,9 @@ public class ReservationRoomDetailsView extends VerticalLayout implements HasUrl
             add(new Paragraph("Price: $" + room.getPrice()));
             add(new Paragraph("Current State: " + room.getState()));
 
+            HotelUser currentUser = ((UserDetailsImpl) SecurityContextHolder
+                    .getContext().getAuthentication().getPrincipal()).getHotelUser();
+
             if (room.getState() == RoomState.RESERVED) {
                 Button checkInButton = new Button("Check In", e -> {
                     Dialog confirmDialog = new Dialog();
@@ -51,6 +60,9 @@ public class ReservationRoomDetailsView extends VerticalLayout implements HasUrl
 
                     Button yesButton = new Button("Yes", ev -> {
                         roomService.updateRoomState(room, RoomState.OCCUPIED);
+
+                        //changing boolean isCheckIn to true
+                        guestRoomService.markReservationAsCheckedIn(currentUser, room);
                         Notification.show("Checked in successfully!");
                         confirmDialog.close();
                         getUI().ifPresent(ui -> ui.navigate("home"));
@@ -74,6 +86,9 @@ public class ReservationRoomDetailsView extends VerticalLayout implements HasUrl
 
                     Button yesButton = new Button("Yes", ev -> {
                         roomService.updateRoomState(room, RoomState.AVAILABLE);
+
+                        //changing boolean isCheckOut to true
+                        guestRoomService.markReservationAsCheckedOut(currentUser, room);
                         Notification.show("Checked out successfully!");
                         confirmDialog.close();
                         getUI().ifPresent(ui -> ui.navigate("home"));

@@ -52,7 +52,7 @@ public class HomeView extends VerticalLayout {
         HotelUser currentUser = ((UserDetailsImpl) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal()).getHotelUser();
 
-        List<GuestRoom> userReservations = guestRoomService.getReservationsByUser(currentUser);
+        List<GuestRoom> userReservations = guestRoomService.getReservationsByUserWhereIsNotCheckOut(currentUser);
         if(!userReservations.isEmpty()) {
             H2 reservationTitle = new H2("My reservation:");
             Grid<GuestRoom> reservationGrid = new Grid<>(GuestRoom.class);
