@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -24,11 +24,15 @@ public class GuestRoom {
     //todo dodac kalendarz i dni ile zostaje
     private int numberOfNightsStayed = 1;
 
-    private LocalDate reservedDate = LocalDate.now();
+    private LocalDateTime reservedDate = LocalDateTime.now();
 
     private boolean isCheckIn = false;
 
+    private LocalDateTime checkInDate;
+
     private boolean isCheckOut = false;
+
+    private LocalDateTime checkOutDate;
 
     @ManyToOne
     @JoinColumn(name = "guest_id")

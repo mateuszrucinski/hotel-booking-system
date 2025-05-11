@@ -52,4 +52,15 @@ public class RoomService {
         room.setState(newRoomState);
         roomRepository.save(room);
     }
+
+    public void updateRoom(Room updatedRoom) {
+        if (!roomRepository.existsById(updatedRoom.getRoomId())) {
+            throw new RoomNotFoundException(updatedRoom.getRoomId());
+        }
+        roomRepository.save(updatedRoom);
+    }
+
+    public void deleteRoom(Long roomId) {
+        roomRepository.deleteById(roomId);
+    }
 }

@@ -7,6 +7,7 @@ import pl.mati.hotel_booking_system.entity.Room;
 import pl.mati.hotel_booking_system.repository.GuestRoomRepository;
 import pl.mati.hotel_booking_system.util.RoomState;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,6 +46,7 @@ public class GuestRoomService {
     public void markReservationAsCheckedIn(HotelUser guest, Room room) {
         guestRoomRepository.findByGuestAndRoomAndIsCheckInFalse(guest, room).ifPresent(reservation -> {
             reservation.setCheckIn(true);
+            reservation.setCheckInDate(LocalDateTime.now());
             guestRoomRepository.save(reservation);
         });
     }
@@ -52,8 +54,13 @@ public class GuestRoomService {
     public void markReservationAsCheckedOut(HotelUser guest, Room room) {
         guestRoomRepository.findByGuestAndRoomAndIsCheckOutFalse(guest, room).ifPresent(reservation -> {
             reservation.setCheckOut(true);
+            reservation.setCheckOutDate(LocalDateTime.now());
             guestRoomRepository.save(reservation);
         });
+    }
+
+    public List<GuestRoom> getAllReservations() {
+        return guestRoomRepository.findAll();
     }
 
     private String generateReservationCode() {
