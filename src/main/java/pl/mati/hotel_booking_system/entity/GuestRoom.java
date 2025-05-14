@@ -3,6 +3,7 @@ package pl.mati.hotel_booking_system.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -17,11 +18,11 @@ public class GuestRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestRoomId;
 
+    @NonNull
     private String reservationCodeId;
 
     private boolean isPaid = false;
 
-    //todo dodac kalendarz i dni ile zostaje
     private int numberOfNightsStayed = 1;
 
     private LocalDateTime reservedDate = LocalDateTime.now();

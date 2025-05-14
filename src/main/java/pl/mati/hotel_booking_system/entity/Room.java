@@ -27,6 +27,4 @@ public class Room {
     private Float price;
     @NonNull
     private RoomState state;
-
-    private Long reservedRoomNumber;
 }
