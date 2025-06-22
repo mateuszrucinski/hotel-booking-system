@@ -61,6 +61,10 @@ public class RoomService {
     }
 
     public void deleteRoom(Long roomId) {
+        // Check if the room exists before attempting to delete
+        if (!roomRepository.existsById(roomId)) {
+            throw new RoomNotFoundException(roomId);
+        }
         roomRepository.deleteById(roomId);
     }
 }
